@@ -1,0 +1,87 @@
+<?xml version="1.0" ?>
+<!--
+Oggetto Yandex Prices extension for Magento
+
+NOTICE OF LICENSE
+
+This source file is subject to the Open Software License (OSL 3.0)
+that is bundled with this package in the file LICENSE.txt.
+It is also available through the world-wide-web at this URL:
+http://opensource.org/licenses/osl-3.0.php
+
+DISCLAIMER
+
+Do not edit or add to this file if you wish to upgrade
+the Oggetto Yandex Prices module to newer versions in the future.
+If you wish to customize the Oggetto Yandex Prices module for your needs
+please refer to http://www.magentocommerce.com for more information.
+
+@category   Oggetto
+@package    Oggetto_YandexPrices
+@copyright  Copyright (C) 2015 Oggetto Web (http://oggettoweb.com)
+@license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+-->
+<config>
+
+    <modules>
+        <Oggetto_YandexPrices>
+            <version>0.1.0</version>
+        </Oggetto_YandexPrices>
+    </modules>
+
+    <global>
+        <models>
+            <oggetto_yandexprices>
+                <class>Oggetto_YandexPrices_Model</class>
+                <resourceModel>oggetto_yandexprices_resource</resourceModel>
+            </oggetto_yandexprices>
+            <oggetto_yandexprices_resource>
+                <class>Oggetto_YandexPrices_Model_Resource</class>
+                <entities>
+                    <table_prices>
+                        <table>oggetto_yandex_prices</table>
+                    </table_prices>
+                </entities>
+            </oggetto_yandexprices_resource>
+        </models>
+
+        <helpers>
+            <oggetto_yandexprices>
+                <class>Oggetto_YandexPrices_Helper</class>
+            </oggetto_yandexprices>
+        </helpers>
+
+        <blocks>
+            <oggetto_yandexprices>
+                <class>Oggetto_YandexPrices_Block</class>
+            </oggetto_yandexprices>
+        </blocks>
+
+        <resources>
+            <oggetto_yandexprices_setup>
+                <setup>
+                    <module>Oggetto_YandexPrices</module>
+                    <connection>core_setup</connection>
+                </setup>
+            </oggetto_yandexprices_setup>
+        </resources>
+
+        <index>
+            <indexer>
+                <table_prices>
+                    <model>oggetto_yandexprices/indexer_prices</model>
+                </table_prices>
+            </indexer>
+        </index>
+    </global>
+
+
+    <phpunit>
+        <suite>
+            <modules>
+                <Oggetto_YandexPrices />
+            </modules>
+        </suite>
+    </phpunit>
+
+</config>
