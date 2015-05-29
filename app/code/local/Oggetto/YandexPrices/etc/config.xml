@@ -75,6 +75,15 @@ please refer to http://www.magentocommerce.com for more information.
         </index>
     </global>
 
+    <frontend>
+        <layout>
+            <updates>
+                <oggetto_yandexprices>
+                    <file>oggetto_yandexprices.xml</file>
+                </oggetto_yandexprices>
+            </updates>
+        </layout>
+    </frontend>
 
     <phpunit>
         <suite>

@@ -50,11 +50,107 @@ class Oggetto_YandexPrices_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case
         $this->_helper = Mage::helper('oggetto_yandexprices');
     }
 
+    /**
+     * Format price by getting only numbers from it, converting and rounding it
+     *
+     * @return void
+     */
+    public function testFormatsPriceByGettingOnlyNumbersConvertingAndRoundingIt()
+    {
+        $price          = '123.456 руб';
+        $priceNumbers   = '123.456';
+        $priceFormatted = 123.45;
+        $currencyFrom   = 'CurFrom';
+        $currencyTo     = 'CurTo';
+
+        $helperDataMock = $this->getHelperMock('oggetto_yandexprices', [
+            'getNumbersFromString', 'convertPrice', 'roundPrice'
+        ]);
+
+        $helperDataMock->expects($this->once())
+            ->method('getNumbersFromString')
+            ->with($price)
+            ->willReturn($priceNumbers);
+
+        $helperDataMock->expects($this->once())
+            ->method('convertPrice')
+            ->with($priceNumbers, $currencyFrom, $currencyTo)
+            ->willReturn($priceNumbers);
+
+        $helperDataMock->expects($this->once())
+            ->method('roundPrice')
+            ->with($priceNumbers)
+            ->willReturn($priceFormatted);
+
+        $this->replaceByMock('helper', 'oggetto_yandexprices', $helperDataMock);
+
+        $this->assertEquals($priceFormatted, $helperDataMock->formatPrice($price, $currencyFrom, $currencyTo));
+    }
+
+    /**
+     * Return numbers from string
+     *
+     * @return void
+     */
     public function testReturnsNumbersFromString()
     {
         $testString = 'h21j5 l4f';
         $testNumber = '2154';
 
         $this->assertEquals($testNumber, $this->_helper->getNumbersFromString($testString));
+    }
+
+    /**
+     * Return converted price
+     *
+     * @return void
+     */
+    public function testReturnsConvertedPrice()
+    {
+        $priceString  = '123.45';
+        $priceFloat   = 123.45;
+        $currencyFrom = 'CurFrom';
+        $currencyTo   = 'CurTo';
+
+        $helperDirectoryMock = $this->getHelperMock('directory', ['currencyConvert']);
+
+        $helperDirectoryMock->expects($this->once())
+            ->method('currencyConvert')
+            ->with($priceFloat, $currencyFrom, $currencyTo)
+            ->willReturn($priceFloat);
+
+        $this->replaceByMock('helper', 'directory', $helperDirectoryMock);
+
+        $this->assertEquals($priceFloat, $this->_helper->convertPrice($priceString, $currencyFrom, $currencyTo));
+    }
+
+    /**
+     * Round price to 2 decimal places
+     *
+     * @return void
+     */
+    public function testRoundsPriceToTwoDecimalPlaces()
+    {
+        $price        = '123.456';
+        $priceRounded = 123.46;
+
+        $this->assertEquals($priceRounded, $this->_helper->roundPrice($price));
+    }
+
+    /**
+     * Add 10% to adducing price if it's less then comparing price
+     *
+     * @param string $ratio  Ratio between prices
+     * @param array  $prices Comparing prices
+     *
+     * @return void
+     *
+     * @dataProvider dataProvider
+     */
+    public function testAddsTenPercentsToAdducingPriceItIsLessThenComparingPrice($ratio, $prices)
+    {
+        $adducedPrice = $this->_helper->adducePrice($prices['adducing_price'], $prices['price']);
+
+        $this->assertEquals($this->expected($ratio)->getAdducedPrice(), $adducedPrice);
     }
 }

@@ -33,6 +33,24 @@
 class Oggetto_YandexPrices_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /**
+     * Format price from Yandex Market
+     *
+     * @param string $price        Price to format
+     * @param string $currencyFrom From currency
+     * @param string $currencyTo   To currency
+     *
+     * @return string
+     */
+    public function formatPrice($price, $currencyFrom, $currencyTo = null)
+    {
+        $price = $this->getNumbersFromString($price);
+        $price = $this->convertPrice($price, $currencyFrom, $currencyTo);
+        $priceFormatted = $this->roundPrice($price);
+
+        return strval($priceFormatted);
+    }
+
+    /**
      * Get numbers from string
      *
      * @param string $str String
@@ -41,5 +59,50 @@ class Oggetto_YandexPrices_Helper_Data extends Mage_Core_Helper_Abstract
     public function getNumbersFromString($str)
     {
         return preg_replace("/[^0-9]/", '', $str);
+    }
+
+    /**
+     * Convert price from currency to currency
+     *
+     * @param string|float $price        Converting price
+     * @param string       $currencyFrom Currency from
+     * @param string       $currencyTo   Currency to
+     *
+     * @return float
+     */
+    public function convertPrice($price, $currencyFrom, $currencyTo = null)
+    {
+        /** @var Mage_Directory_Helper_Data $helperDirectory */
+        $helperDirectory = Mage::helper('directory');
+
+        $priceConverted = $helperDirectory->currencyConvert((float) $price, $currencyFrom, $currencyTo);
+        return $priceConverted;
+    }
+
+    /**
+     * Round price to 2 decimal places
+     *
+     * @param string|float $price Price to round
+     * @return float
+     */
+    public function roundPrice($price)
+    {
+        $priceRounded = Mage::app()->getStore()->roundPrice($price);
+        return $priceRounded;
+    }
+
+    /**
+     * Add to adducing price 10 percents if it less then price
+     *
+     * @param mixed $adducingPrice Adducing price
+     * @param mixed $price         Price
+     * 
+     * @return string
+     */
+    public function adducePrice($adducingPrice, $price)
+    {
+        $adducedPrice = $adducingPrice >= $price ? $adducingPrice : $adducingPrice * 1.1;
+
+        return strval($adducedPrice);
     }
 }

@@ -1,7 +1,39 @@
 <?php
+/**
+ * Oggetto Yandex Prices extension for Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade
+ * the Oggetto Yandex Prices module to newer versions in the future.
+ * If you wish to customize the Oggetto Yandex Prices module for your needs
+ * please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category   Oggetto
+ * @package    Oggetto_YandexPrices
+ * @copyright  Copyright (C) 2015 Oggetto Web (http://oggettoweb.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
 
+/**
+ * Yandex Prices Indexer Resource Model
+ *
+ * @category   Oggetto
+ * @package    Oggetto_YandexPrices
+ * @subpackage Model
+ * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
+ */
 class Oggetto_YandexPrices_Model_Resource_Indexer_Prices extends Mage_Index_Model_Resource_Abstract
 {
+    const YANDEX_MARKET_PRICE_CURRENCY = 'RUB';
+
     /**
      * Init object
      *
@@ -61,7 +93,7 @@ class Oggetto_YandexPrices_Model_Resource_Indexer_Prices extends Mage_Index_Mode
             $modelProduct = Mage::getModel('catalog/product');
             /** @var Mage_Catalog_Model_Resource_Product_Collection $productCollection */
             $productCollection = $modelProduct->getCollection()
-                ->addAttributeToSelect('name')
+                ->addAttributeToSelect('name', 'price')
                 ->addAttributeToFilter('entity_id', $productId);
 
             /** @var Oggetto_YandexPrices_Model_Api_Market $api */
@@ -73,14 +105,21 @@ class Oggetto_YandexPrices_Model_Resource_Indexer_Prices extends Mage_Index_Mode
             $data = [];
             /** @var Mage_Catalog_Model_Product $product */
             foreach ($productCollection as $product) {
+                $productPrice = $product->getPrice();
+
                 $price = $api->fetchPriceFromMarket($product->getName());
+
+                $priceFormatted = $helper->formatPrice($price, $this::YANDEX_MARKET_PRICE_CURRENCY);
+                $priceAdduced   = $helper->adducePrice($priceFormatted, $productPrice);
+
                 $data[] = [
                     'product_id' => $product->getId(),
-                    'price'      => $helper->getNumbersFromString($price)
+                    'price'      => $priceAdduced
                 ];
             }
-
+            $this->_getIndexAdapter()->delete($this->getMainTable(), ['product_id IN(?)' => $productId]);
         } else {
+            $this->_getIndexAdapter()->delete($this->getMainTable());
         }
     }
 }

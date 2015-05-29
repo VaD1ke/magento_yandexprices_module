@@ -1,0 +1,12 @@
+-
+  - less
+  - adducing_price: 123.45
+    price: 123.46
+-
+  - equal
+  - adducing_price: 123.45
+    price: 123.45
+-
+  - more
+  - adducing_price: 123.46
+    price: 123.45
