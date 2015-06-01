@@ -33,6 +33,11 @@
 class Oggetto_YandexPrices_Model_Price extends Mage_Core_Model_Abstract
 {
     /**
+     * Yandex Market price currency
+     */
+    const YANDEX_MARKET_PRICE_CURRENCY = 'RUB';
+
+    /**
      * Init object
      *
      * @return void
@@ -51,5 +56,37 @@ class Oggetto_YandexPrices_Model_Price extends Mage_Core_Model_Abstract
     public function isPriceExist()
     {
         return $this->hasPrice();
+    }
+
+    /**
+     * Get products IDs and Yandex Market prices from products collection
+     *
+     * @param Mage_Catalog_Model_Resource_Product_Collection $productCollection Products collection
+     * @return array
+     */
+    public function getProductsData($productCollection)
+    {
+        /** @var Oggetto_YandexPrices_Model_Api_Market $api */
+        $api = Mage::getModel('oggetto_yandexprices/api_market');
+        /** @var Oggetto_YandexPrices_Helper_Data $helper */
+        $helper = Mage::helper('oggetto_yandexprices');
+
+        $data = [];
+        /** @var Mage_Catalog_Model_Product $product */
+        foreach ($productCollection as $product) {
+            $price = $api->fetchPriceFromMarket($product->getName());
+
+            $productPrice = $product->getFinalPrice();
+
+            $priceFormatted = $helper->formatPrice($price, $this::YANDEX_MARKET_PRICE_CURRENCY);
+            $priceAdduced   = $helper->adducePrice($priceFormatted, $productPrice);
+
+            $data[] = [
+                'product_id' => $product->getId(),
+                'price'      => $priceAdduced
+            ];
+        }
+
+        return $data;
     }
 }

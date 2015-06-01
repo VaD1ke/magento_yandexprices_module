@@ -32,7 +32,6 @@
  */
 class Oggetto_YandexPrices_Model_Resource_Indexer_Prices extends Mage_Index_Model_Resource_Abstract
 {
-    const YANDEX_MARKET_PRICE_CURRENCY = 'RUB';
 
     /**
      * Init object
@@ -85,41 +84,37 @@ class Oggetto_YandexPrices_Model_Resource_Indexer_Prices extends Mage_Index_Mode
      */
     protected function _reindexEntity($productId = null)
     {
+        /** @var Mage_Catalog_Model_Product $modelProduct */
+        $modelProduct = Mage::getModel('catalog/product');
+
+        Mage::app()->setCurrentStore('1');
+
+        /** @var Oggetto_YandexPrices_Model_Price $modelPrice */
+        $modelPrice = Mage::getModel('oggetto_yandexprices/price');
+
         if (!is_null($productId)) {
             if (!is_array($productId)) {
                 $productId = [$productId];
             }
-            /** @var Mage_Catalog_Model_Product $modelProduct */
-            $modelProduct = Mage::getModel('catalog/product');
             /** @var Mage_Catalog_Model_Resource_Product_Collection $productCollection */
             $productCollection = $modelProduct->getCollection()
-                ->addAttributeToSelect('name', 'price')
-                ->addAttributeToFilter('entity_id', $productId);
+                ->addAttributeToSelect('name')
+                ->addAttributeToFilter('entity_id', $productId)
+                ->addFinalPrice();
 
-            /** @var Oggetto_YandexPrices_Model_Api_Market $api */
-            $api = Mage::getModel('oggetto_yandexprices/api_market');
-            /** @var Oggetto_YandexPrices_Helper_Data $helper */
-            $helper = Mage::helper('oggetto_yandexprices');
-
-
-            $data = [];
-            /** @var Mage_Catalog_Model_Product $product */
-            foreach ($productCollection as $product) {
-                $productPrice = $product->getPrice();
-
-                $price = $api->fetchPriceFromMarket($product->getName());
-
-                $priceFormatted = $helper->formatPrice($price, $this::YANDEX_MARKET_PRICE_CURRENCY);
-                $priceAdduced   = $helper->adducePrice($priceFormatted, $productPrice);
-
-                $data[] = [
-                    'product_id' => $product->getId(),
-                    'price'      => $priceAdduced
-                ];
-            }
             $this->_getIndexAdapter()->delete($this->getMainTable(), ['product_id IN(?)' => $productId]);
         } else {
+            /** @var Mage_Catalog_Model_Resource_Product_Collection $productCollection */
+            $productCollection = $modelProduct->getCollection()
+                ->addAttributeToSelect('name')
+                ->addFinalPrice();
+
             $this->_getIndexAdapter()->delete($this->getMainTable());
         }
+        Mage::app()->setCurrentStore('0');
+
+        $data = $modelPrice->getProductsData($productCollection);
+
+        $this->_getIndexAdapter()->insertMultiple($this->getMainTable(), $data);
     }
 }

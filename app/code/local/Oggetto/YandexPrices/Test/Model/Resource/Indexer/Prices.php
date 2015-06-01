@@ -62,10 +62,63 @@ class Oggetto_YandexPrices_Test_Model_Resource_Indexer_Prices extends EcomDev_PH
     }
 
     /**
+     * Reindex all invoke reindexEntity() without arguments
+     *
+     * @return void
+     */
+    public function testReindexAllInvokeReindexEntityWithoutArguments()
+    {
+        $resourceModelPricesMock =
+            $this->getResourceModelMock('oggetto_yandexprices/indexer_prices', ['_reindexEntity']);
+
+        $resourceModelPricesMock->expects($this->once())
+            ->method('_reindexEntity')
+            ->with(null);
+
+        $this->replaceByMock('resource_model', 'oggetto_yandexprices/indexer_prices', $resourceModelPricesMock);
+
+        $resourceModelPricesMock->reindexAll();
+    }
+
+    /**
+     * Reindex product prices when few catalog products are saving
+     */
+    public function testReindexProductPricesWhenOneCatalogProductAreSaving()
+    {
+        $id = '777';
+        $event = new Varien_Object;
+        $event->setData('product_id', $id);
+
+        $resourceModelPricesMock =
+            $this->getResourceModelMock('oggetto_yandexprices/indexer_prices', ['_reindexEntity']);
+
+        $resourceModelPricesMock->expects($this->once())
+            ->method('_reindexEntity')
+            ->with($id);
+
+        $this->replaceByMock('resource_model', 'oggetto_yandexprices/indexer_prices', $resourceModelPricesMock);
+
+        $resourceModelPricesMock->catalogProductSave($event);
+    }
+
+    /**
      * Reindex product prices when few catalog products are saving
      */
     public function testReindexProductPricesWhenFewCatalogProductsAreSaving()
     {
+        $ids = ['777', '888', '999'];
+        $event = new Varien_Object;
+        $event->setData('product_ids', $ids);
 
+        $resourceModelPricesMock =
+            $this->getResourceModelMock('oggetto_yandexprices/indexer_prices', ['_reindexEntity']);
+
+        $resourceModelPricesMock->expects($this->once())
+            ->method('_reindexEntity')
+            ->with($ids);
+
+        $this->replaceByMock('resource_model', 'oggetto_yandexprices/indexer_prices', $resourceModelPricesMock);
+
+        $resourceModelPricesMock->catalogProductMassAction($event);
     }
 }

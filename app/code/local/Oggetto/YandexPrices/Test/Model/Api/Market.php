@@ -23,32 +23,15 @@
  */
 
 /**
- * Indexer Prices model test class
+ * Market model test class
  *
  * @category   Oggetto
  * @package    Oggetto_YandexPrices
  * @subpackage Test
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Oggetto_YandexPrices_Test_Model_Indexer_Prices extends EcomDev_PHPUnit_Test_Case
+class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Case
 {
-    /**
-     * Model indexer prices
-     *
-     * @var Oggetto_YandexPrices_Model_Indexer_Prices
-     */
-    protected $_model = null;
-
-    /**
-     * Set up initial variables
-     *
-     * @return void
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->_model = Mage::getModel('oggetto_yandexprices/indexer_prices');
-    }
 
     /**
      * Check model alias
@@ -58,18 +41,39 @@ class Oggetto_YandexPrices_Test_Model_Indexer_Prices extends EcomDev_PHPUnit_Tes
     public function testChecksModelAlias()
     {
         $this->assertInstanceOf(
-            'Oggetto_YandexPrices_Model_Indexer_Prices', Mage::getModel('oggetto_yandexprices/indexer_prices')
+            'Oggetto_YandexPrices_Model_Api_Market', Mage::getModel('oggetto_yandexprices/api_market')
         );
     }
 
     /**
-     * Check resource model name
+     * Return fetched price from searched product ID in Yandex Market
      *
      * @return void
      */
-    public function testChecksResourceModelName()
+    public function testReturnsFetchedPriceFromSearchedProductInYandexMarket()
     {
-        $this->assertEquals('oggetto_yandexprices/indexer_prices', $this->_model->getResourceName());
+        $productName   = 'name';
+        $linkToProduct = 'link';
+        $price         = '123';
+
+
+        $modelMarketMock = $this->getModelMock('oggetto_yandexprices/api_market', [
+            'searchProduct', 'getProductPrice'
+        ]);
+
+        $modelMarketMock->expects($this->once())
+            ->method('searchProduct')
+            ->with($productName)
+            ->willReturn($linkToProduct);
+
+        $modelMarketMock->expects($this->once())
+            ->method('getProductPrice')
+            ->with($linkToProduct)
+            ->willReturn($price);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_market', $modelMarketMock);
+
+        $this->assertEquals($price, $modelMarketMock->fetchPriceFromMarket($productName));
     }
 
 }

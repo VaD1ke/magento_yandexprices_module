@@ -23,53 +23,15 @@
  */
 
 /**
- * Indexer Prices model test class
+ * Parser model test class
  *
  * @category   Oggetto
  * @package    Oggetto_YandexPrices
  * @subpackage Test
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Oggetto_YandexPrices_Test_Model_Indexer_Prices extends EcomDev_PHPUnit_Test_Case
+class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Case
 {
-    /**
-     * Model indexer prices
-     *
-     * @var Oggetto_YandexPrices_Model_Indexer_Prices
-     */
-    protected $_model = null;
 
-    /**
-     * Set up initial variables
-     *
-     * @return void
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->_model = Mage::getModel('oggetto_yandexprices/indexer_prices');
-    }
-
-    /**
-     * Check model alias
-     *
-     * @return void
-     */
-    public function testChecksModelAlias()
-    {
-        $this->assertInstanceOf(
-            'Oggetto_YandexPrices_Model_Indexer_Prices', Mage::getModel('oggetto_yandexprices/indexer_prices')
-        );
-    }
-
-    /**
-     * Check resource model name
-     *
-     * @return void
-     */
-    public function testChecksResourceModelName()
-    {
-        $this->assertEquals('oggetto_yandexprices/indexer_prices', $this->_model->getResourceName());
-    }
 
 }

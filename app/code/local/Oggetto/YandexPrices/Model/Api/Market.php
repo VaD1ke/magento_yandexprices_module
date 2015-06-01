@@ -60,7 +60,7 @@ class Oggetto_YandexPrices_Model_Api_Market
     public function fetchPriceFromMarket($productName)
     {
         $linkToProduct = $this->searchProduct($productName);
-        $price = $this->getProductPrice($linkToProduct);
+        $price         = $this->getProductPrice($linkToProduct);
 
         return $price;
     }

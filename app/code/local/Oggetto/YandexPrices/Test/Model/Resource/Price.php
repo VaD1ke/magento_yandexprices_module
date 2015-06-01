@@ -23,21 +23,21 @@
  */
 
 /**
- * Indexer Prices model test class
+ * Price resource model test class
  *
  * @category   Oggetto
  * @package    Oggetto_YandexPrices
  * @subpackage Test
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Oggetto_YandexPrices_Test_Model_Indexer_Prices extends EcomDev_PHPUnit_Test_Case
+class Oggetto_YandexPrices_Test_Model_Resource_Price extends EcomDev_PHPUnit_Test_Case
 {
     /**
-     * Model indexer prices
+     * Resource model price
      *
-     * @var Oggetto_YandexPrices_Model_Indexer_Prices
+     * @var Oggetto_YandexPrices_Model_Resource_Price
      */
-    protected $_model = null;
+    protected $_resourceModel = null;
 
     /**
      * Set up initial variables
@@ -47,29 +47,17 @@ class Oggetto_YandexPrices_Test_Model_Indexer_Prices extends EcomDev_PHPUnit_Tes
     protected function setUp()
     {
         parent::setUp();
-        $this->_model = Mage::getModel('oggetto_yandexprices/indexer_prices');
+        $this->_resourceModel = Mage::getResourceModel('oggetto_yandexprices/price');
     }
 
     /**
-     * Check model alias
+     * Checks main table and id field name
      *
      * @return void
      */
-    public function testChecksModelAlias()
+    public function testChecksMainTableAndIdFieldName()
     {
-        $this->assertInstanceOf(
-            'Oggetto_YandexPrices_Model_Indexer_Prices', Mage::getModel('oggetto_yandexprices/indexer_prices')
-        );
+        $this->assertEquals('oggetto_yandex_prices', $this->_resourceModel->getMainTable());
+        $this->assertEquals('product_id', $this->_resourceModel->getIdFieldName());
     }
-
-    /**
-     * Check resource model name
-     *
-     * @return void
-     */
-    public function testChecksResourceModelName()
-    {
-        $this->assertEquals('oggetto_yandexprices/indexer_prices', $this->_model->getResourceName());
-    }
-
 }

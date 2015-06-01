@@ -39,6 +39,7 @@ class Oggetto_YandexPrices_Model_Indexer_Prices extends Mage_Index_Model_Indexer
      */
     protected $_matchedEntities = [
         Mage_Catalog_Model_Product::ENTITY => [
+            Mage_Index_Model_Event::TYPE_REINDEX,
             Mage_Index_Model_Event::TYPE_SAVE,
             Mage_Index_Model_Event::TYPE_MASS_ACTION
         ],
