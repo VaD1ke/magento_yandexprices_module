@@ -58,7 +58,7 @@ class Oggetto_YandexPrices_Model_Api_Parser
      */
     public function parseProductLink($html)
     {
-        $dom = new Zend_Dom_Query($html);
+        $dom = $this->_getZendDomQuery($html);
 
         $query = $this->_cssClasses['productLink'];
 
@@ -77,7 +77,7 @@ class Oggetto_YandexPrices_Model_Api_Parser
      */
     public function parseProductPrice($html)
     {
-        $dom = new Zend_Dom_Query($html);
+        $dom = $this->_getZendDomQuery($html);
 
         $query = $this->_cssClasses['productPrice'];
 
@@ -87,5 +87,16 @@ class Oggetto_YandexPrices_Model_Api_Parser
             return $price;
         }
         return null;
+    }
+
+    /**
+     * Get Zend_Dom_Query object
+     *
+     * @param string $html Html
+     * @return Zend_Dom_Query
+     */
+    protected function _getZendDomQuery($html)
+    {
+        return new Zend_Dom_Query($html);
     }
 }
