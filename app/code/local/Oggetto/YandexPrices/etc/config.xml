@@ -68,9 +68,9 @@ please refer to http://www.magentocommerce.com for more information.
 
         <index>
             <indexer>
-                <table_prices>
+                <oggetto_yandexprices>
                     <model>oggetto_yandexprices/indexer_prices</model>
-                </table_prices>
+                </oggetto_yandexprices>
             </indexer>
         </index>
     </global>

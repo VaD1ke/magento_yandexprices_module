@@ -30,7 +30,7 @@
  * @subpackage Block
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Oggetto_YandexPrices_Block_Price extends Mage_Core_Block_Template
+class Oggetto_YandexPrices_Block_Price extends Mage_Catalog_Block_Product_View
 {
     /**
      * Get price
