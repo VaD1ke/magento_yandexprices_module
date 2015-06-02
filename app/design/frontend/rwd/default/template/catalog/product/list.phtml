@@ -146,6 +146,8 @@
                     ?>
                     <?php echo $this->getPriceHtml($_product, true) ?>
 
+                    <?php echo $this->getChild('yandex_category_price')->setProduct($_product)->toHtml() ?>
+
                     <?php if($_product->getRatingSummary()): ?>
                     <?php echo $this->getReviewsSummaryHtml($_product, 'short') ?>
                     <?php endif; ?>
