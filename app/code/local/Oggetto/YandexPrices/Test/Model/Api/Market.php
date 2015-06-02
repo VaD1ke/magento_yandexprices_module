@@ -238,7 +238,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     /**
      * Get Http response mock with status OK(200) and getBody method
      *
-     * @param string $body   Response body
+     * @param string $body Response body
      *
      * @return PHPUnit_Framework_MockObject_MockObject
      */

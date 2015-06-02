@@ -79,7 +79,7 @@ class Oggetto_YandexPrices_Model_Indexer_Prices extends Mage_Index_Model_Indexer
     /**
      * Register event
      *
-     * @param Mage_Index_Model_Event $event
+     * @param Mage_Index_Model_Event $event Event
      * @return void
      */
     protected function _registerEvent(Mage_Index_Model_Event $event)

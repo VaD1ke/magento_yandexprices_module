@@ -57,7 +57,7 @@ class Oggetto_YandexPrices_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case
      */
     public function testFormatsPriceByGettingOnlyNumbersConvertingAndRoundingIt()
     {
-        $price          = '123.456 руб';
+        $price          = '123.456 rub';
         $priceNumbers   = '123.456';
         $priceFormatted = 123.45;
         $currencyFrom   = 'CurFrom';

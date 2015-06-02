@@ -225,4 +225,3 @@ class Oggetto_YandexPrices_Test_Model_Price extends EcomDev_PHPUnit_Test_Case
         $this->replaceByMock('model', 'oggetto_yandexprices/api_market', $modelApiMock);
     }
 }
-

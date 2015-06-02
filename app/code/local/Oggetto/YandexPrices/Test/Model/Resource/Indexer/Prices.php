@@ -82,6 +82,8 @@ class Oggetto_YandexPrices_Test_Model_Resource_Indexer_Prices extends EcomDev_PH
 
     /**
      * Reindex product prices when few catalog products are saving
+     *
+     * @return void
      */
     public function testReindexProductPricesWhenOneCatalogProductAreSaving()
     {
@@ -103,6 +105,8 @@ class Oggetto_YandexPrices_Test_Model_Resource_Indexer_Prices extends EcomDev_PH
 
     /**
      * Reindex product prices when few catalog products are saving
+     *
+     * @return void
      */
     public function testReindexProductPricesWhenFewCatalogProductsAreSaving()
     {
