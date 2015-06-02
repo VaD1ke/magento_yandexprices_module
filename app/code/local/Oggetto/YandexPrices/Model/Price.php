@@ -75,16 +75,22 @@ class Oggetto_YandexPrices_Model_Price extends Mage_Core_Model_Abstract
         /** @var Mage_Catalog_Model_Product $product */
         foreach ($productCollection as $product) {
             $price = $api->fetchPriceFromMarket($product->getName());
+            if (!is_null($price)) {
+                $productPrice = $product->getFinalPrice();
 
-            $productPrice = $product->getFinalPrice();
+                $priceFormatted = $helper->formatPrice($price, $this::YANDEX_MARKET_PRICE_CURRENCY);
+                $priceAdduced   = $helper->adducePrice($priceFormatted, $productPrice);
 
-            $priceFormatted = $helper->formatPrice($price, $this::YANDEX_MARKET_PRICE_CURRENCY);
-            $priceAdduced   = $helper->adducePrice($priceFormatted, $productPrice);
-
-            $data[] = [
-                'product_id' => $product->getId(),
-                'price'      => $priceAdduced
-            ];
+                $data[] = [
+                    'product_id' => $product->getId(),
+                    'price'      => $priceAdduced
+                ];
+            } else {
+                $data[] = [
+                    'product_id' => $product->getId(),
+                    'price'      => $price
+                ];
+            }
         }
 
         return $data;

@@ -95,7 +95,7 @@ class Oggetto_YandexPrices_Test_Model_Price extends EcomDev_PHPUnit_Test_Case
      *
      * @return void
      */
-    public function testReturnsProductsIdsAndYandexPricesFromProductCollection()
+    public function testReturnsProductsIdsAndYandexPricesFromProductCollectionIfPriceIsNotNull()
     {
         $id             = '777';
         $currency       = Oggetto_YandexPrices_Model_Price::YANDEX_MARKET_PRICE_CURRENCY;
@@ -138,14 +138,7 @@ class Oggetto_YandexPrices_Test_Model_Price extends EcomDev_PHPUnit_Test_Case
         $productCollection = [ $modelProductMock ];
 
 
-        $modelApiMock = $this->getModelMock('oggetto_yandexprices/api_market', ['fetchPriceFromMarket']);
-
-        $modelApiMock->expects($this->once())
-            ->method('fetchPriceFromMarket')
-            ->with($productExpects['name'])
-            ->willReturn($price);
-
-        $this->replaceByMock('model', 'oggetto_yandexprices/api_market', $modelApiMock);
+        $this->_mockMarketModelForFetchingPriceFromYandex($productExpects['name'], $price);
 
 
         $helperDataMock = $this->getHelperMock('oggetto_yandexprices', ['formatPrice', 'adducePrice']);
@@ -164,6 +157,72 @@ class Oggetto_YandexPrices_Test_Model_Price extends EcomDev_PHPUnit_Test_Case
 
 
         $this->assertEquals($returnData, $this->_modelPrice->getProductsData($productCollection));
+    }
+
+    /**
+     * Return products IDs and Yandex Market Prices from product collection
+     *
+     * @return void
+     */
+    public function testReturnsProductsIdsAndNullPricesFromProductCollectionIfPriceIsNull()
+    {
+        $id             = '777';
+
+        $productExpects = [
+            'id'          => $id,
+            'name'        => 'name1'
+        ];
+
+        $returnData = [
+            [
+                'product_id' => $id,
+                'price'      => null
+            ]
+        ];
+
+        $modelProductMock = $this->getModelMock('catalog/product', [
+            'getName', 'getId'
+        ]);
+
+        $modelProductMock->expects($this->once())
+            ->method('getName')
+            ->willReturn($productExpects['name']);
+
+        $modelProductMock->expects($this->once())
+            ->method('getId')
+            ->willReturn($productExpects['id']);
+
+        $this->replaceByMock('model', 'catalog/product', $modelProductMock);
+
+
+        $productCollection = [ $modelProductMock ];
+
+
+        $this->_mockMarketModelForFetchingPriceFromYandex($productExpects['name']);
+
+
+        $this->assertEquals($returnData, $this->_modelPrice->getProductsData($productCollection));
+    }
+
+
+    /**
+     * Mock api model for Yandex Market for fetching price by name
+     *
+     * @param string      $expectedName Expected product name
+     * @param string|null $fetchedPrice Fetched from market price
+     *
+     * @return void
+     */
+    protected function _mockMarketModelForFetchingPriceFromYandex($expectedName, $fetchedPrice = null)
+    {
+        $modelApiMock = $this->getModelMock('oggetto_yandexprices/api_market', ['fetchPriceFromMarket']);
+
+        $modelApiMock->expects($this->once())
+            ->method('fetchPriceFromMarket')
+            ->with($expectedName)
+            ->willReturn($fetchedPrice);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_market', $modelApiMock);
     }
 }
 

@@ -1,6 +1,6 @@
 <?php /** @var Oggetto_YandexPrices_Block_Category $this*/ ?>
 <?php $yandex_price = $this->getPrice();
 
-if ($yandex_price != 0): ?>
+if (!is_null($yandex_price)): ?>
     <h5>Цена на Яндекс Маркете: <?php echo $yandex_price; ?> руб.</h5>
 <?php endif; ?>
