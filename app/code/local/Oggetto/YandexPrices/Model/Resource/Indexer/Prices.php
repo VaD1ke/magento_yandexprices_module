@@ -99,7 +99,7 @@ class Oggetto_YandexPrices_Model_Resource_Indexer_Prices extends Mage_Index_Mode
             /** @var Mage_Catalog_Model_Resource_Product_Collection $productCollection */
             $productCollection = $modelProduct->getCollection()
                 ->addAttributeToSelect('name')
-                ->addAttributeToFilter('entity_id', $productId)
+                ->addIdFilter($productId)
                 ->addFinalPrice();
 
             $this->_getIndexAdapter()->delete($this->getMainTable(), ['product_id IN(?)' => $productId]);
