@@ -23,15 +23,44 @@
  */
 
 /**
- * Fetcher model test class
+ * Proxy fetcher model test class
  *
  * @category   Oggetto
  * @package    Oggetto_YandexPrices
  * @subpackage Test
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Oggetto_YandexPrices_Test_Model_Api_Fetcher extends EcomDev_PHPUnit_Test_Case
+class Oggetto_YandexPrices_Test_Model_Proxy_Fetcher extends EcomDev_PHPUnit_Test_Case
 {
+    /**
+     * Return proxy array from file
+     *
+     * @return void
+     */
+    public function testReturnsProxyArrayFromFile()
+    {
+        $path = 'path';
 
+        $arrayFromFile = [
+            'ip1:port1',
+            'ip2:port2'
+        ];
 
+        $modelFetcherMock = $this->getModelMock('oggetto_yandexprices/proxy_fetcher', [
+            '_getArrayFromFile', '_getPath'
+        ]);
+
+        $modelFetcherMock->expects($this->once())
+            ->method('_getPath')
+            ->willReturn($path);
+
+        $modelFetcherMock->expects($this->once())
+            ->method('_getArrayFromFile')
+            ->with($path)
+            ->willReturn($arrayFromFile);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/proxy_fetcher', $modelFetcherMock);
+
+        $this->assertEquals($this->expected()->getProxyArray(), $modelFetcherMock->getProxyArray());
+    }
 }

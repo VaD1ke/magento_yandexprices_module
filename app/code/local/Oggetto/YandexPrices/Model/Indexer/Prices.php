@@ -84,6 +84,7 @@ class Oggetto_YandexPrices_Model_Indexer_Prices extends Mage_Index_Model_Indexer
      */
     protected function _registerEvent(Mage_Index_Model_Event $event)
     {
+        Mage::log('saga');
         /* @var $entity Mage_Catalog_Model_Product */
         $entity = $event->getDataObject();
 

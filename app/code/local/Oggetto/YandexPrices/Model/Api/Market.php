@@ -55,12 +55,29 @@ class Oggetto_YandexPrices_Model_Api_Market
      * Fetch price from Yandex Market
      *
      * @param string $productName Product name
+     * @param bool   $withProxy   With proxy
+     * @param int    $index       Proxy array index
+     *
      * @return null|string
      */
-    public function fetchPriceFromMarket($productName)
+    public function fetchPriceFromMarket($productName, $withProxy = false, $index = 0)
     {
-        $linkToProduct = $this->searchProduct($productName);
-        $price         = $this->getProductPrice($linkToProduct);
+        $price = null;
+        if (!$withProxy) {
+            $linkToProduct = $this->searchProduct($productName);
+            $price = $this->getProductPrice($linkToProduct);
+        } else {
+            $config = $this->getConfig($index);
+
+            if (!is_null($config)) {
+                try {
+                    $linkToProduct = $this->searchProduct($productName, $config);
+                    $price = $this->getProductPrice($linkToProduct, $config);
+                } catch (Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement $e) {
+                    $price = $this->fetchPriceFromMarket($productName, true, ++$index);
+                }
+            }
+        }
 
         return $price;
     }
@@ -69,12 +86,15 @@ class Oggetto_YandexPrices_Model_Api_Market
      * Search product in Yandex Market
      *
      * @param string $productName Product Name
+     * @param array  $httpConfig  Http config
+     *
      * @return string|null
+     * @throws Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement
      */
-    public function searchProduct($productName)
+    public function searchProduct($productName, $httpConfig = null)
     {
         /** @var Zend_Http_Client $client */
-        $client = $this->_getHttpClient();
+        $client = $this->_getHttpClient(null, $httpConfig);
         $client->resetParameters(true);
         $client->setParameterGet([
             'cvredirect' => '1',
@@ -87,7 +107,11 @@ class Oggetto_YandexPrices_Model_Api_Market
             /** @var Oggetto_YandexPrices_Model_Api_Parser $parser */
             $parser = Mage::getModel('oggetto_yandexprices/api_parser');
 
-            $link = $parser->parseProductLink($response->getBody());
+            $body = $response->getBody();
+            if ($parser->parseCheckCaptchaPage($body)) {
+                throw new Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement();
+            }
+            $link = $parser->parseProductLink($body);
 
             return $link;
         }
@@ -98,11 +122,14 @@ class Oggetto_YandexPrices_Model_Api_Market
      * Get product price
      *
      * @param string $url Product URL
+     * @param array  $httpConfig  Http config
+     *
      * @return string|null
+     * @throws Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement
      */
-    public function getProductPrice($url)
+    public function getProductPrice($url, $httpConfig = null)
     {
-        $client = $this->_getHttpClient($url);
+        $client = $this->_getHttpClient($url, $httpConfig);
 
         $response = $client->request(Varien_Http_Client::GET);
 
@@ -110,7 +137,12 @@ class Oggetto_YandexPrices_Model_Api_Market
             /** @var Oggetto_YandexPrices_Model_Api_Parser $parser */
             $parser = Mage::getModel('oggetto_yandexprices/api_parser');
 
-            $price = $parser->parseProductPrice($response->getBody());
+            $body = $response->getBody();
+            if ($parser->parseCheckCaptchaPage($body)) {
+                throw new Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement();
+            }
+
+            $price = $parser->parseProductPrice($body);
 
             return $price;
         }
@@ -118,18 +150,61 @@ class Oggetto_YandexPrices_Model_Api_Market
     }
 
     /**
+     * Get config for proxy
+     *
+     * @param int $index Index in proxy array
+     *
+     * @return array|null
+     */
+    public function getConfig($index = 0)
+    {
+        /** @var Oggetto_YandexPrices_Model_Proxy_Fetcher $fetcher */
+        $fetcher = Mage::getModel('oggetto_yandexprices/proxy_fetcher');
+
+        $proxyArray = $fetcher->getProxyArray();
+
+        if (array_key_exists($index, $proxyArray)) {
+            $ip = $proxyArray[$index]['ip'];
+            $port = $proxyArray[$index]['port'];
+
+            return $this->_getConfigForProxy($ip, $port);
+        }
+
+        return null;
+    }
+
+
+    /**
      * Get http client with url
      *
-     * @param string $url URL
+     * @param string $url    URL
+     * @param array  $config Config
      * @return Zend_Http_Client
      */
-    protected function _getHttpClient($url = null)
+    protected function _getHttpClient($url = null, $config = null)
     {
         if (is_null($url)) {
-            $this->_httpClient = new Varien_Http_Client($this->_url);
+            $this->_httpClient = new Varien_Http_Client($this->_url, $config);
         } else {
-            $this->_httpClient = new Varien_Http_Client($url);
+            $this->_httpClient = new Varien_Http_Client($url, $config);
         }
         return $this->_httpClient;
+    }
+
+    /**
+     * Return array config for proxy
+     *
+     * @param string $ip   Proxy IP
+     * @param string $port Proxy port
+     *
+     * @return array
+     */
+    public function _getConfigForProxy($ip, $port)
+    {
+        return [
+            'adapter'    => 'Zend_Http_Client_Adapter_Proxy',
+            'proxy_host' => $ip,
+            'proxy_port' => $port,
+        ];
     }
 }

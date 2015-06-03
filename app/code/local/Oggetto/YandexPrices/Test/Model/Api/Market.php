@@ -97,16 +97,37 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
 
         $modelMarketMock = $this->_getMarketModelMockForGettingHttpClient($httpClientMock);
 
-        $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', ['parseProductLink']);
-
-        $modelParserMock->expects($this->once())
-            ->method('parseProductLink')
-            ->with($body)
-            ->willReturn($link);
-
-        $this->replaceByMock('model', 'oggetto_yandexprices/api_parser', $modelParserMock);
+        $this->_mockOggettoApiMarketModelForParsingOnCaptchaAndGetProductLink($body, $link);
 
         $this->assertEquals($link, $modelMarketMock->searchProduct($productName));
+    }
+
+    /**
+     * Throw exception from parsing search page with OK(200) response status wher page is captcha
+     *
+     * @return void
+     */
+    public function testThrowsExceptionFromParsingSearchPageWithOkResponseStatusWhenPageIsCaptcha()
+    {
+        $productName  = 'name';
+        $parameterGet = [
+            'cvredirect' => '1',
+            'text'       => $productName
+        ];
+        $body = 'body';
+
+        $httpResponseMock = $this->_getHttpResponseMockWithStatusOkAndGetBodyMethod($body);
+
+        $httpClientMock =
+            $this->_getHttpClientMockWithResetAndSetParametersMethodsAndRequest($httpResponseMock, $parameterGet);
+
+        $modelMarketMock = $this->_getMarketModelMockForGettingHttpClient($httpClientMock);
+
+        $this->_mockOggettoApiMarketModelForParsingOnCaptchaAndNotGetProductLink($body);
+
+        $this->setExpectedException('Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement');
+
+        $modelMarketMock->searchProduct($productName);
     }
 
     /**
@@ -150,16 +171,33 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
 
         $modelMarketMock = $this->_getMarketModelMockForGettingHttpClient($httpClientMock, $url);
 
-        $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', ['parseProductPrice']);
-
-        $modelParserMock->expects($this->once())
-            ->method('parseProductPrice')
-            ->with($body)
-            ->willReturn($price);
-
-        $this->replaceByMock('model', 'oggetto_yandexprices/api_parser', $modelParserMock);
+        $this->_mockOggettoApiMarketModelForParsingOnCaptchaAndGetProductPrice($body, $price);
 
         $this->assertEquals($price, $modelMarketMock->getProductPrice($url));
+    }
+
+    /**
+     * Throw exception from parsing product page with OK(200) response status wher page is captcha
+     *
+     * @return void
+     */
+    public function testThrowsExceptionFromParsingProductPageWithOkResponseStatusWhenPageIsCaptcha()
+    {
+        $url   = 'url';
+        $body  = 'body';
+
+        $httpResponseMock = $this->_getHttpResponseMockWithStatusOkAndGetBodyMethod($body);
+
+        $httpClientMock =
+            $this->_getHttpClientMockWithResetAndSetParametersMethodsAndRequest($httpResponseMock);
+
+        $modelMarketMock = $this->_getMarketModelMockForGettingHttpClient($httpClientMock, $url);
+
+        $this->_mockOggettoApiMarketModelForParsingOnCaptchaAndNotGetProductPrice($body);
+
+        $this->setExpectedException('Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement');
+
+        $modelMarketMock->getProductPrice($url);
     }
 
     /**
@@ -179,6 +217,77 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
         $modelMarketMock = $this->_getMarketModelMockForGettingHttpClient($httpClientMock, $url);
 
         $this->assertNull($modelMarketMock->getProductPrice($url));
+    }
+
+    /**
+     * Return config array for proxy
+     *
+     * @return void
+     */
+    public function testReturnsConfigArrayForProxy()
+    {
+        $ip   = '123';
+        $port = '45';
+
+        $proxyArray = [
+            [
+                'ip'   => 'ip12',
+                'port' => 'port12'
+            ],
+            [
+                'ip'   => $ip,
+                'port' => $port
+            ]
+        ];
+
+        $configArray = [
+            'adapter'    => 'Zend_Http_Client_Adapter_Proxy',
+            'proxy_host' => $ip,
+            'proxy_port' => $port,
+        ];
+
+        $modelMarketMock = $this->getModelMock('oggetto_yandexprices/api_market', ['_getConfigForProxy']);
+
+        $modelMarketMock->expects($this->once())
+            ->method('_getConfigForProxy')
+            ->with($ip, $port)
+            ->willReturn($configArray);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_market', $modelMarketMock);
+
+
+        $this->_mockOggettoProxyFetcherModelForGettingProxyArray($proxyArray);
+
+        $this->assertEquals($configArray, $modelMarketMock->getConfig(1));
+    }
+
+    /**
+     * Return config array for proxy
+     *
+     * @return void
+     */
+    public function testReturnsNullWhenProxyArrayDoesNotHaveEstablishedKey()
+    {
+        /** @var Oggetto_YandexPrices_Model_Api_Market $apiMarketModel */
+        $apiMarketModel = Mage::getModel('oggetto_yandexprices/api_market');
+
+        $ip   = '123';
+        $port = '45';
+
+        $proxyArray = [
+            [
+                'ip'   => 'ip12',
+                'port' => 'port12'
+            ],
+            [
+                'ip'   => $ip,
+                'port' => $port
+            ]
+        ];
+
+        $this->_mockOggettoProxyFetcherModelForGettingProxyArray($proxyArray);
+
+        $this->assertNull($apiMarketModel->getConfig(3));
     }
 
 
@@ -282,4 +391,119 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
         return $httpResponseMock;
     }
 
+    /**
+     * Mock oggetto api market model for parsing on captcha and get product link
+     *
+     * @param string $body      Html body
+     * @param string $link      Product link
+     *
+     * @return void
+     */
+    protected function _mockOggettoApiMarketModelForParsingOnCaptchaAndGetProductLink($body, $link)
+    {
+        $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', [
+            'parseProductLink', 'parseCheckCaptchaPage']);
+
+        $modelParserMock->expects($this->once())
+            ->method('parseCheckCaptchaPage')
+            ->with($body)
+            ->willReturn(false);
+
+        $modelParserMock->expects($this->once())
+            ->method('parseProductLink')
+            ->with($body)
+            ->willReturn($link);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_parser', $modelParserMock);
+    }
+
+    /**
+     * Mock oggetto api market model for parsing on captcha and get product link
+     *
+     * @param string $body      Html body
+     *
+     * @return void
+     */
+    protected function _mockOggettoApiMarketModelForParsingOnCaptchaAndNotGetProductLink($body)
+    {
+        $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', [
+            'parseProductLink', 'parseCheckCaptchaPage']);
+
+        $modelParserMock->expects($this->once())
+            ->method('parseCheckCaptchaPage')
+            ->with($body)
+            ->willReturn(true);
+
+        $modelParserMock->expects($this->never())
+            ->method('parseProductLink');
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_parser', $modelParserMock);
+    }
+
+    /**
+     * Mock oggetto api market model for parsing on captcha and get product price
+     *
+     * @param string $body      Html body
+     * @param string $price      Product price
+     *
+     * @return void
+     */
+    protected function _mockOggettoApiMarketModelForParsingOnCaptchaAndGetProductPrice($body, $price)
+    {
+        $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', [
+            'parseProductPrice', 'parseCheckCaptchaPage']);
+
+        $modelParserMock->expects($this->once())
+            ->method('parseCheckCaptchaPage')
+            ->with($body)
+            ->willReturn(false);
+
+        $modelParserMock->expects($this->once())
+            ->method('parseProductPrice')
+            ->with($body)
+            ->willReturn($price);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_parser', $modelParserMock);
+    }
+
+    /**
+     * Mock oggetto api market model for parsing on captcha and get product link
+     *
+     * @param string $body      Html body
+     *
+     * @return void
+     */
+    protected function _mockOggettoApiMarketModelForParsingOnCaptchaAndNotGetProductPrice($body)
+    {
+        $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', [
+            'parseProductPrice', 'parseCheckCaptchaPage']);
+
+        $modelParserMock->expects($this->once())
+            ->method('parseCheckCaptchaPage')
+            ->with($body)
+            ->willReturn(true);
+
+        $modelParserMock->expects($this->never())
+            ->method('parseProductPrice');
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_parser', $modelParserMock);
+    }
+
+    /**
+     * Mock Oggetto proxy fetcher model for getting proxy array
+     *
+     * @param array $proxyArray Proxy array
+     *
+     * @return void
+     */
+    protected function _mockOggettoProxyFetcherModelForGettingProxyArray($proxyArray)
+    {
+        $modelFetcherMock = $this->getModelMock('oggetto_yandexprices/proxy_fetcher', ['getProxyArray']);
+
+        $modelFetcherMock->expects($this->once())
+            ->method('getProxyArray')
+            ->willReturn($proxyArray);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/proxy_fetcher', $modelFetcherMock);
+    }
 }

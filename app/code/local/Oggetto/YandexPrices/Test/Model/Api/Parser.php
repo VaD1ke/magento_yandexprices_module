@@ -49,7 +49,8 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
         parent::setUp();
         $this->_cssClasses = [
             'productLink'  => '.b-minicards__r a',
-            'productPrice' => '.b-price'
+            'productPrice' => '.b-price',
+            'captchaForm'  => '.form__inner'
         ];
     }
 
@@ -73,9 +74,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
             ->with('href')
             ->willReturn($link);
 
-
         $domQueryResultMock = $this->_getDomQueryResultMockForGettingDomElement($domElementMock);
-
 
         $domQueryMock =
             $this->_getDomQueryMockForGettingQueryResult($domQueryResultMock, $this->_cssClasses['productLink']);
@@ -148,6 +147,69 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
         $this->assertNull($modelParserMock->parseProductPrice($html));
     }
 
+    /**
+     * Return true from parsing page on captcha
+     *
+     * @return void
+     */
+    public function testReturnsTrueFromParsingPageOnCaptcha()
+    {
+        $html = 'html';
+
+        $domElementMock = $this->_getDOMElementMockForGettingActionAttribute('/checkcaptcha');
+
+        $domQueryResultMock = $this->_getDomQueryResultMockForGettingDomElement($domElementMock);
+
+        $domQueryMock =
+            $this->_getDomQueryMockForGettingQueryResult($domQueryResultMock, $this->_cssClasses['captchaForm']);
+
+        $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
+
+        $this->assertTrue($modelParserMock->parseCheckCaptchaPage($html));
+    }
+
+    /**
+     * Return false from parsing page on captcha if cation attribute value is not captcha
+     *
+     * @return void
+     */
+    public function testReturnsFalseFromParsingPageOnCaptchaIfActionAttributeValueIsNotCaptcha()
+    {
+        $html = 'html';
+
+        $domElementMock = $this->_getDOMElementMockForGettingActionAttribute();
+
+        $domQueryResultMock = $this->_getDomQueryResultMockForGettingDomElement($domElementMock);
+
+        $domQueryMock =
+            $this->_getDomQueryMockForGettingQueryResult($domQueryResultMock, $this->_cssClasses['captchaForm']);
+
+        $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
+
+        $this->assertFalse($modelParserMock->parseCheckCaptchaPage($html));
+    }
+
+    /**
+     * Return false from parsing page on captcha if cation attribute value is not captcha
+     *
+     * @return void
+     */
+    public function testReturnsFalseFromParsingPageOnCaptchaIfFormElementIsNotExist()
+    {
+        $html = 'html';
+
+        $this->_mockDOMElementWithNeverInvokedGettingAttribute();
+
+        $domQueryResultMock = $this->_getDomQueryResultMockForGettingDomElement();
+
+        $domQueryMock =
+            $this->_getDomQueryMockForGettingQueryResult($domQueryResultMock, $this->_cssClasses['captchaForm']);
+
+        $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
+
+        $this->assertFalse($modelParserMock->parseCheckCaptchaPage($html));
+    }
+
 
     /**
      * Get parser model mock for getting Zend_Dom_Query mock
@@ -200,7 +262,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
      * @param PHPUnit_Framework_MockObject_MockObject $domElementMock DOMElement mock
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    protected function _getDomQueryResultMockForGettingDomElement($domElementMock)
+    protected function _getDomQueryResultMockForGettingDomElement($domElementMock = null)
     {
         $domQueryResultMock = $this->getMockBuilder('Zend_Dom_Query_Result')
             ->disableOriginalConstructor()
@@ -212,5 +274,41 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
             ->willReturn($domElementMock);
 
         return $domQueryResultMock;
+    }
+
+    /**
+     * Get DOMElement mock for getting action attribute
+     *
+     * @param string $valueAttribute Value attribute
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function _getDOMElementMockForGettingActionAttribute($valueAttribute = null)
+    {
+        $domElementMock = $this->getMockBuilder('DOMElement')
+            ->disableOriginalConstructor()
+            ->setMethods(['getAttribute'])
+            ->getMock();
+
+        $domElementMock->expects($this->once())
+            ->method('getAttribute')
+            ->willReturn($valueAttribute);
+
+        return $domElementMock;
+    }
+
+    /**
+     * Mock DOMElement for getting action attribute
+     *
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function _mockDOMElementWithNeverInvokedGettingAttribute()
+    {
+        $domElementMock = $this->getMockBuilder('DOMElement')
+            ->disableOriginalConstructor()
+            ->setMethods(['getAttribute'])
+            ->getMock();
+
+        $domElementMock->expects($this->never())
+            ->method('getAttribute');
     }
 }

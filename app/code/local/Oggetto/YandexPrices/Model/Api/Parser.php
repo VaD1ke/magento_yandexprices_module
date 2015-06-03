@@ -46,7 +46,8 @@ class Oggetto_YandexPrices_Model_Api_Parser
     {
         $this->_cssClasses = [
             'productLink'  => '.b-minicards__r a',
-            'productPrice' => '.b-price'
+            'productPrice' => '.b-price',
+            'captchaForm'  => '.form__inner'
         ];
     }
 
@@ -88,6 +89,27 @@ class Oggetto_YandexPrices_Model_Api_Parser
         }
         return null;
     }
+
+    /**
+     * Parse check captcha page
+     *
+     * @param string $html Html
+     * @return bool
+     */
+    public function parseCheckCaptchaPage($html)
+    {
+        $dom = $this->_getZendDomQuery($html);
+        $query = $this->_cssClasses['captchaForm'];
+
+        if ($results = $dom->query($query)->current()) {
+            if ($results->getAttribute('action') == '/checkcaptcha') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * Get Zend_Dom_Query object

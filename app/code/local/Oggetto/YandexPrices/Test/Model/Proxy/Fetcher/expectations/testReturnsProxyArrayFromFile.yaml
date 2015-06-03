@@ -1,0 +1,5 @@
+proxy_array:
+  - ip: ip1
+    port: port1
+  - ip: ip2
+    port: port2
