@@ -128,8 +128,8 @@ class Oggetto_YandexPrices_Model_Api_Market
     /**
      * Get product price
      *
-     * @param string $url Product URL
-     * @param array  $httpConfig  Http config
+     * @param string $url        Product URL
+     * @param array  $httpConfig Http config
      *
      * @return string|null
      * @throws Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement

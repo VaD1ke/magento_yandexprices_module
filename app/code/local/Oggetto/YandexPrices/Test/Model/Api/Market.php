@@ -140,11 +140,11 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     }
 
     /**
-     * Return fetched price from searched product ID in Yandex Market
+     * Catches Exception from searched product in Yandex Market if Proxy exists and config is not null
      *
      * @return void
      */
-    public function testWillCatchExceptionFromSearchedProductInYandexMarketIfProxyExistsConfigIsNotNull()
+    public function testCatchesExceptionFromSearchedProductInYandexMarketIfProxyExistsConfigIsNotNull()
     {
         $productName   = 'name';
         $price         = '123';
@@ -498,8 +498,8 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     /**
      * Mock oggetto api market model for parsing on captcha and get product link
      *
-     * @param string $body      Html body
-     * @param string $link      Product link
+     * @param string $body Html body
+     * @param string $link Product link
      *
      * @return void
      */
@@ -524,7 +524,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     /**
      * Mock oggetto api market model for parsing on captcha and get product link
      *
-     * @param string $body      Html body
+     * @param string $body Html body
      *
      * @return void
      */
@@ -547,8 +547,8 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     /**
      * Mock oggetto api market model for parsing on captcha and get product price
      *
-     * @param string $body      Html body
-     * @param string $price      Product price
+     * @param string $body  Html body
+     * @param string $price Product price
      *
      * @return void
      */
@@ -573,7 +573,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     /**
      * Mock oggetto api market model for parsing on captcha and get product link
      *
-     * @param string $body      Html body
+     * @param string $body Html body
      *
      * @return void
      */
