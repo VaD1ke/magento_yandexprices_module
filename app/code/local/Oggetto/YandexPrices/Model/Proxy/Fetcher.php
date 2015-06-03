@@ -77,7 +77,7 @@ class Oggetto_YandexPrices_Model_Proxy_Fetcher
      */
     protected function _getArrayFromFile($path)
     {
-        return file($path);
+        return file($path, FILE_IGNORE_NEW_LINES);
     }
 
     /**

@@ -38,6 +38,12 @@ class Oggetto_YandexPrices_Model_Api_Market
      */
     protected $_url;
     /**
+     * User agent
+     *
+     * @var string
+     */
+    protected $_userAgent;
+    /**
      * Http client for Yandex Market
      * @var Varien_Http_Client
      */
@@ -49,6 +55,7 @@ class Oggetto_YandexPrices_Model_Api_Market
     public function __construct()
     {
         $this->_url = 'http://m.market.yandex.ru/search.xml';
+        $this->_userAgent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:38.0) Gecko/20100101 Firefox/38.0';
     }
 
     /**
@@ -74,7 +81,7 @@ class Oggetto_YandexPrices_Model_Api_Market
                     $linkToProduct = $this->searchProduct($productName, $config);
                     $price = $this->getProductPrice($linkToProduct, $config);
                 } catch (Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement $e) {
-                    $price = $this->fetchPriceFromMarket($productName, true, ++$index);
+                    $price = $this->_callFetchPriceFromMarketForRecursion($productName, ++$index);
                 }
             }
         }
@@ -185,6 +192,7 @@ class Oggetto_YandexPrices_Model_Api_Market
     {
         if (is_null($url)) {
             $this->_httpClient = new Varien_Http_Client($this->_url, $config);
+
         } else {
             $this->_httpClient = new Varien_Http_Client($url, $config);
         }
@@ -199,12 +207,26 @@ class Oggetto_YandexPrices_Model_Api_Market
      *
      * @return array
      */
-    public function _getConfigForProxy($ip, $port)
+    protected function _getConfigForProxy($ip, $port)
     {
         return [
+            'useragent'  => $this->_userAgent,
             'adapter'    => 'Zend_Http_Client_Adapter_Proxy',
             'proxy_host' => $ip,
             'proxy_port' => $port,
         ];
+    }
+
+    /**
+     * Call fetchPriceFromYandexMarket() for recursion
+     *
+     * @param string $productName Product name
+     * @param int    $index       Index
+     *
+     * @return null|string
+     */
+    protected function _callFetchPriceFromMarketForRecursion($productName, $index)
+    {
+        return $this->fetchPriceFromMarket($productName, true, $index);
     }
 }

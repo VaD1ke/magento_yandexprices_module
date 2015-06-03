@@ -76,6 +76,70 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     }
 
     /**
+     * Return fetched price from searched product ID in Yandex Market
+     *
+     * @return void
+     */
+    public function testReturnsNullPriceFromSearchedProductInYandexMarketIfProxyExistAndConfigIsNull()
+    {
+        $productName   = 'name';
+
+        $modelMarketMock = $this->getModelMock('oggetto_yandexprices/api_market', [
+            'searchProduct', 'getProductPrice', 'getConfig'
+        ]);
+
+        $modelMarketMock->expects($this->never())
+            ->method('searchProduct');
+
+        $modelMarketMock->expects($this->never())
+            ->method('getProductPrice');
+
+        $modelMarketMock->expects($this->once())
+            ->method('getConfig')
+            ->with(0)
+            ->willReturn(null);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_market', $modelMarketMock);
+
+        $this->assertNull($modelMarketMock->fetchPriceFromMarket($productName, true));
+    }
+
+    /**
+     * Return fetched price from searched product ID in Yandex Market
+     *
+     * @return void
+     */
+    public function testReturnsFetchedPriceFromSearchedProductInYandexMarketIfProxyExistsConfigIsNotNullAndNoException()
+    {
+        $productName   = 'name';
+        $linkToProduct = 'link';
+        $price         = '123';
+        $config        = ['config'];
+
+        $modelMarketMock = $this->getModelMock('oggetto_yandexprices/api_market', [
+            'searchProduct', 'getProductPrice', 'getConfig'
+        ]);
+
+        $modelMarketMock->expects($this->once())
+            ->method('searchProduct')
+            ->with($productName, $config)
+            ->willReturn($linkToProduct);
+
+        $modelMarketMock->expects($this->once())
+            ->method('getProductPrice')
+            ->with($linkToProduct, $config)
+            ->willReturn($price);
+
+        $modelMarketMock->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($config);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_market', $modelMarketMock);
+
+        $this->assertEquals($price, $modelMarketMock->fetchPriceFromMarket($productName, true));
+    }
+
+    /**
      * Return product link from parsed search page with OK(200) response status
      *
      * @return void
