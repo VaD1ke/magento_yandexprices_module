@@ -140,6 +140,46 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     }
 
     /**
+     * Return fetched price from searched product ID in Yandex Market
+     *
+     * @return void
+     */
+    public function testWillCatchExceptionFromSearchedProductInYandexMarketIfProxyExistsConfigIsNotNull()
+    {
+        $productName   = 'name';
+        $price         = '123';
+        $config        = ['config'];
+        $index         = 0;
+        $exception     = new Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement;
+
+        $modelMarketMock = $this->getModelMock('oggetto_yandexprices/api_market', [
+            'searchProduct', 'getProductPrice',
+            'getConfig',     '_callFetchPriceFromMarketForRecursion'
+        ]);
+
+        $modelMarketMock->expects($this->once())
+            ->method('searchProduct')
+            ->with($productName, $config)
+            ->willThrowException($exception);
+
+        $modelMarketMock->expects($this->never())
+            ->method('getProductPrice');
+
+        $modelMarketMock->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($config);
+
+        $modelMarketMock->expects($this->once())
+            ->method('_callFetchPriceFromMarketForRecursion')
+            ->with($productName, $index + 1)
+            ->willReturn($price);
+
+        $this->replaceByMock('model', 'oggetto_yandexprices/api_market', $modelMarketMock);
+
+        $this->assertEquals($price, $modelMarketMock->fetchPriceFromMarket($productName, true, $index));
+    }
+
+    /**
      * Return product link from parsed search page with OK(200) response status
      *
      * @return void
