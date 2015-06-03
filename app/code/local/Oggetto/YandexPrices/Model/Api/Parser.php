@@ -57,7 +57,7 @@ class Oggetto_YandexPrices_Model_Api_Parser
      * @param string $html Html to parse
      * @return string|null
      */
-    public function parseProductLink($html)
+    public function getProductLink($html)
     {
         $dom = $this->_getZendDomQuery($html);
 
@@ -76,7 +76,7 @@ class Oggetto_YandexPrices_Model_Api_Parser
      * @param string $html Html to parse
      * @return string|null
      */
-    public function parseProductPrice($html)
+    public function getProductPrice($html)
     {
         $dom = $this->_getZendDomQuery($html);
 
@@ -91,12 +91,12 @@ class Oggetto_YandexPrices_Model_Api_Parser
     }
 
     /**
-     * Parse check captcha page
+     * Parse Check captcha page
      *
      * @param string $html Html
      * @return bool
      */
-    public function parseCheckCaptchaPage($html)
+    public function isCaptchaPage($html)
     {
         $dom = $this->_getZendDomQuery($html);
         $query = $this->_cssClasses['captchaForm'];

@@ -506,15 +506,15 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     protected function _mockOggettoApiMarketModelForParsingOnCaptchaAndGetProductLink($body, $link)
     {
         $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', [
-            'parseProductLink', 'parseCheckCaptchaPage']);
+            'getProductLink', 'isCaptchaPage']);
 
         $modelParserMock->expects($this->once())
-            ->method('parseCheckCaptchaPage')
+            ->method('isCaptchaPage')
             ->with($body)
             ->willReturn(false);
 
         $modelParserMock->expects($this->once())
-            ->method('parseProductLink')
+            ->method('getProductLink')
             ->with($body)
             ->willReturn($link);
 
@@ -531,15 +531,15 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     protected function _mockOggettoApiMarketModelForParsingOnCaptchaAndNotGetProductLink($body)
     {
         $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', [
-            'parseProductLink', 'parseCheckCaptchaPage']);
+            'getProductLink', 'isCaptchaPage']);
 
         $modelParserMock->expects($this->once())
-            ->method('parseCheckCaptchaPage')
+            ->method('isCaptchaPage')
             ->with($body)
             ->willReturn(true);
 
         $modelParserMock->expects($this->never())
-            ->method('parseProductLink');
+            ->method('getProductLink');
 
         $this->replaceByMock('model', 'oggetto_yandexprices/api_parser', $modelParserMock);
     }
@@ -555,15 +555,15 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     protected function _mockOggettoApiMarketModelForParsingOnCaptchaAndGetProductPrice($body, $price)
     {
         $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', [
-            'parseProductPrice', 'parseCheckCaptchaPage']);
+            'getProductPrice', 'isCaptchaPage']);
 
         $modelParserMock->expects($this->once())
-            ->method('parseCheckCaptchaPage')
+            ->method('isCaptchaPage')
             ->with($body)
             ->willReturn(false);
 
         $modelParserMock->expects($this->once())
-            ->method('parseProductPrice')
+            ->method('getProductPrice')
             ->with($body)
             ->willReturn($price);
 
@@ -580,15 +580,15 @@ class Oggetto_YandexPrices_Test_Model_Api_Market extends EcomDev_PHPUnit_Test_Ca
     protected function _mockOggettoApiMarketModelForParsingOnCaptchaAndNotGetProductPrice($body)
     {
         $modelParserMock = $this->getModelMock('oggetto_yandexprices/api_parser', [
-            'parseProductPrice', 'parseCheckCaptchaPage']);
+            'getProductPrice', 'isCaptchaPage']);
 
         $modelParserMock->expects($this->once())
-            ->method('parseCheckCaptchaPage')
+            ->method('isCaptchaPage')
             ->with($body)
             ->willReturn(true);
 
         $modelParserMock->expects($this->never())
-            ->method('parseProductPrice');
+            ->method('getProductPrice');
 
         $this->replaceByMock('model', 'oggetto_yandexprices/api_parser', $modelParserMock);
     }

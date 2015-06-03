@@ -81,7 +81,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
 
         $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
 
-        $this->assertEquals($link, $modelParserMock->parseProductLink($html));
+        $this->assertEquals($link, $modelParserMock->getProductLink($html));
     }
 
     /**
@@ -100,7 +100,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
 
         $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
 
-        $this->assertNull($modelParserMock->parseProductLink($html));
+        $this->assertNull($modelParserMock->getProductLink($html));
     }
 
     /**
@@ -124,7 +124,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
         $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
 
 
-        $this->assertEquals($price, $modelParserMock->parseProductPrice($html));
+        $this->assertEquals($price, $modelParserMock->getProductPrice($html));
     }
 
     /**
@@ -144,7 +144,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
         $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
 
 
-        $this->assertNull($modelParserMock->parseProductPrice($html));
+        $this->assertNull($modelParserMock->getProductPrice($html));
     }
 
     /**
@@ -165,7 +165,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
 
         $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
 
-        $this->assertTrue($modelParserMock->parseCheckCaptchaPage($html));
+        $this->assertTrue($modelParserMock->isCaptchaPage($html));
     }
 
     /**
@@ -186,7 +186,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
 
         $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
 
-        $this->assertFalse($modelParserMock->parseCheckCaptchaPage($html));
+        $this->assertFalse($modelParserMock->isCaptchaPage($html));
     }
 
     /**
@@ -207,7 +207,7 @@ class Oggetto_YandexPrices_Test_Model_Api_Parser extends EcomDev_PHPUnit_Test_Ca
 
         $modelParserMock = $this->_getParserModelMockForGettingZendDomQuery($domQueryMock, $html);
 
-        $this->assertFalse($modelParserMock->parseCheckCaptchaPage($html));
+        $this->assertFalse($modelParserMock->isCaptchaPage($html));
     }
 
 

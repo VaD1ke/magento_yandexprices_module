@@ -74,7 +74,7 @@ class Oggetto_YandexPrices_Model_Price extends Mage_Core_Model_Abstract
         $data = [];
         /** @var Mage_Catalog_Model_Product $product */
         foreach ($productCollection as $product) {
-            $price = $api->fetchPriceFromMarket($product->getName());
+            $price = $api->fetchPriceFromMarket($product->getName(), true);
             if (!is_null($price)) {
                 $productPrice = $product->getFinalPrice();
 

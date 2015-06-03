@@ -115,10 +115,10 @@ class Oggetto_YandexPrices_Model_Api_Market
             $parser = Mage::getModel('oggetto_yandexprices/api_parser');
 
             $body = $response->getBody();
-            if ($parser->parseCheckCaptchaPage($body)) {
+            if ($parser->isCaptchaPage($body)) {
                 throw new Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement();
             }
-            $link = $parser->parseProductLink($body);
+            $link = $parser->getProductLink($body);
 
             return $link;
         }
@@ -145,11 +145,11 @@ class Oggetto_YandexPrices_Model_Api_Market
             $parser = Mage::getModel('oggetto_yandexprices/api_parser');
 
             $body = $response->getBody();
-            if ($parser->parseCheckCaptchaPage($body)) {
+            if ($parser->isCaptchaPage($body)) {
                 throw new Oggetto_YandexPrices_Model_Exception_CaptchaInputRequirement();
             }
 
-            $price = $parser->parseProductPrice($body);
+            $price = $parser->getProductPrice($body);
 
             return $price;
         }
