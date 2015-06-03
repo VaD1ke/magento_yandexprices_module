@@ -87,8 +87,6 @@ class Oggetto_YandexPrices_Model_Resource_Indexer_Prices extends Mage_Index_Mode
         /** @var Mage_Catalog_Model_Product $modelProduct */
         $modelProduct = Mage::getModel('catalog/product');
 
-        Mage::app()->setCurrentStore('1');
-
         /** @var Oggetto_YandexPrices_Model_Price $modelPrice */
         $modelPrice = Mage::getModel('oggetto_yandexprices/price');
 
@@ -99,6 +97,7 @@ class Oggetto_YandexPrices_Model_Resource_Indexer_Prices extends Mage_Index_Mode
             /** @var Mage_Catalog_Model_Resource_Product_Collection $productCollection */
             $productCollection = $modelProduct->getCollection()
                 ->addAttributeToSelect('name')
+                ->setStore('1')
                 ->addIdFilter($productId)
                 ->addFinalPrice();
 
@@ -107,11 +106,11 @@ class Oggetto_YandexPrices_Model_Resource_Indexer_Prices extends Mage_Index_Mode
             /** @var Mage_Catalog_Model_Resource_Product_Collection $productCollection */
             $productCollection = $modelProduct->getCollection()
                 ->addAttributeToSelect('name')
+                ->setStore('1')
                 ->addFinalPrice();
 
             $this->_getIndexAdapter()->delete($this->getMainTable());
         }
-        Mage::app()->setCurrentStore('0');
 
         $data = $modelPrice->getProductsData($productCollection);
 
